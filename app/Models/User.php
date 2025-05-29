@@ -21,6 +21,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'social_logins',
+        'email_verified_at'
     ];
 
     /**
@@ -43,6 +45,24 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'social_logins' => 'array',
         ];
+    }
+
+    public function hasSocialLogin(string $provider): bool
+    {
+        return isset($this->social_logins[$provider]);
+    }
+
+    public function getSocialLoginId(string $provider): ?string
+    {
+        return $this->social_logins[$provider]['id'] ?? null;
+    }
+
+    public function addSocialLogin(string $provider, string $id, array $data = []): void
+    {
+        $socialLogins = $this->social_logins ?? [];
+        $socialLogins[$provider] = array_merge(['id' => $id], $data);
+        $this->update(['social_logins' => $socialLogins]);
     }
 }
